@@ -1,0 +1,35 @@
+<!DOCTYPRE html>
+<html lan="en">
+	<head>
+		<meta charset="UTF=8" />
+		<meta name="viewport" content="width=device-width" />
+                <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<title>Document</title>
+	</head>
+	<body>
+		<h1>IQ get key</h1>
+		<p>Get Token for IQ auth</p>
+		<button id="NeedToken">NeedToken</button>
+		<button id="DeployApp">DeployApp</button>
+        <script>
+            const button1 = document.getElementById('NeedToken');
+            button1.addEventListener('click', async fetchtoken => {
+
+			const api_tok_url='getToken';
+			const response_tok = await fetch(api_tok_url);
+			const json_tok = await response_tok.json();
+			console.log(json_tok.token);
+            UseToken = json_tok.token;
+		    })
+			const button2 = document.getElementById('DeployApp');
+			button2.addEventListener('click', async fetchtoken => {
+
+            const api_app_url=`DeployApp/${UseToken}`;
+            const response_app = await fetch(api_app_url);
+            const json_app = await response_app.json();
+            console.log(json_app);
+			})
+			   
+	    </script>
+	</body>
+</html>
