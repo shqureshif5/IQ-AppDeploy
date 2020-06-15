@@ -9,12 +9,22 @@
 	<body>
 		<h1>IQ get key</h1>
 		<p>Get Token for IQ auth</p>
+		<form>
+			Select Site:
+			<select id="SelectDC">
+				<option value="172.30.107.15">DC-A</option>
+				<option value="172.30.107.14">DC-B</option>
+			</select>
+		</form>
+
+		Enter Domain Name of new service: <input type="text" id="myName" >.f5.local
+
 		<button id="NeedToken">NeedToken</button>
 		<button id="DeployApp">DeployApp</button>
+		<button id="buildJSON">buildJSON</button>
         <script>
             const button1 = document.getElementById('NeedToken');
             button1.addEventListener('click', async fetchtoken => {
-
 			const api_tok_url='getToken';
 			const response_tok = await fetch(api_tok_url);
 			const json_tok = await response_tok.json();
@@ -22,14 +32,38 @@
             UseToken = json_tok.token;
 		    })
 			const button2 = document.getElementById('DeployApp');
-			button2.addEventListener('click', async fetchtoken => {
-
+			button2.addEventListener('click', async deploy => {
+			const DomainName=`${document.getElementById("Name")}.f5.local`;
+			console.log("Domain",DomainName);
+            const targetBIGIP=document.getElementById("SelectDC").value;
             const api_app_url=`DeployApp/${UseToken}`;
             const response_app = await fetch(api_app_url);
             const json_app = await response_app.json();
             console.log(json_app);
 			})
-			   
+			const button3 = document.getElementById('buildJSON');			
+			button3.addEventListener('click', async build => {
+			const DomainName=document.getElementById("myName").value;
+			//console.log("Domain",DomainName);
+			const targetBIGIP=document.getElementById("SelectDC").value;
+			//console.log("targetBIGIP",targetBIGIP);
+			if( typeof UseToken == 'undefined' ) {
+				UseToken = "empty";
+                // foo could get resolved and it's defined
+            }
+			const data={"DomainName":`${DomainName}`,"targetDC":`${targetBIGIP}`,"token":`${UseToken}`};
+			const api_app_url='buildJSON';
+			const requestOptions = {
+				method: 'POST',
+				headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({data})
+            };
+            const response_app = await fetch(api_app_url,requestOptions);
+            const json_app = await response_app.json();
+            console.log(json_app);
+			})			   
 	    </script>
 	</body>
 </html>
