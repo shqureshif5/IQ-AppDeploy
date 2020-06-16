@@ -1,0 +1,57 @@
+{
+  "applicationName":"NewApp_val",
+  "appSvcsDeclaration": {
+    "class": "AS3",
+    "action": "deploy",
+    "persist": true,
+        "declaration": {
+          "class": "ADC",
+          "schemaVersion": "3.12.0",
+          "target": {
+            "address": "1.1.1.1_val"
+          },
+          "TenantID_val": {
+            "class": "Tenant",
+            "NewAppService_val": {
+              "class": "Application",
+              "schemaOverlay": "SimpleHTTPSwithWAFandOWASP",
+              "template": "https",
+              "serviceMain": {
+                "virtualAddresses": [
+                  "2.2.2.2_val"
+                ],
+                "class": "Service_HTTPS"
+              },
+              "Pool": {
+                "members": [
+                  {
+                    "servicePort": 80,
+                    "serverAddresses": [
+                      "3.3.3.3%RD_val"
+                    ]
+                  }
+                ],
+                "class": "Pool"
+              },
+              "TLS_Server": {
+                "certificates": [
+                  {
+                    "certificate": "Certificate"
+                  }
+                ],
+                "class": "TLS_Server"
+              },
+              "WAF_Policy": {
+                "class": "WAF_Policy"
+              },
+              "Certificate": {
+                "class": "Certificate"
+              },
+              "Analytics_Profile": {
+                "class": "Analytics_Profile"
+              }
+            }
+          }
+      }
+    }
+  }
