@@ -1,0 +1,314 @@
+{
+    "type": "object",
+    "required": [
+        "class"
+    ],
+    "properties": {
+        "class": {
+            "type": "string",
+            "const": "Application"
+        },
+        "label": {},
+        "remark": {},
+        "template": {},
+        "schemaOverlay": {}
+    },
+    "definitions": {
+        "Pool": {
+            "type": "object",
+            "properties": {
+                "class": {},
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "monitors": {
+                                "type": "array",
+                                "const": [
+                                    "http"
+                                ],
+                                "default": [
+                                    "http"
+                                ]
+                            },
+                            "adminState": {
+                                "type": "string",
+                                "const": "enable",
+                                "default": "enable"
+                            },
+                            "shareNodes": {
+                                "type": "boolean",
+                                "const": true,
+                                "default": true
+                            },
+                            "servicePort": {
+                                "type": "number",
+                                "const": 80,
+                                "default": 80
+                            },
+                            "serverAddresses": {
+                                "type": "array"
+                            }
+                        }
+                    }
+                },
+                "monitors": {
+                    "type": "array",
+                    "const": [
+                        "http"
+                    ],
+                    "default": [
+                        "http"
+                    ]
+                }
+            },
+            "additionalproperties": false
+        },
+        "TLS_Server": {
+            "type": "object",
+            "properties": {
+                "class": {},
+                "certificates": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "certificate": {
+                                "type": "string",
+                                "default": "Certificate"
+                            }
+                        }
+                    },
+                    "maxItems": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "WAF_Policy": {
+            "type": "object",
+            "default": {},
+            "properties": {
+                "url": {
+                    "type": "object",
+                    "default": {},
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "const": "https://raw.githubusercontent.com/f5devcentral/f5-asm-policy-templates/master/owasp_ready_template/owasp-auto-tune-v1.1.xml",
+                            "default": "https://raw.githubusercontent.com/f5devcentral/f5-asm-policy-templates/master/owasp_ready_template/owasp-auto-tune-v1.1.xml"
+                        }
+                    }
+                },
+                "class": {},
+                "enforcementMode": {
+                    "type": "string",
+                    "const": "blocking",
+                    "default": "blocking"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Certificate": {
+            "type": "object",
+            "properties": {
+                "class": {},
+                "privateKey": {
+                    "type": "object",
+                    "default": {},
+                    "properties": {
+                        "bigip": {
+                            "type": "string",
+                            "const": "/Common/default.key",
+                            "default": "/Common/default.key"
+                        }
+                    }
+                },
+                "certificate": {
+                    "type": "object",
+                    "default": {},
+                    "properties": {
+                        "bigip": {
+                            "type": "string",
+                            "const": "/Common/default.crt",
+                            "default": "/Common/default.crt"
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "Service_HTTPS": {
+            "type": "object",
+            "default": {},
+            "properties": {
+                "pool": {
+                    "type": "string",
+                    "const": "Pool",
+                    "default": "Pool"
+                },
+                "class": {},
+                "enable": {
+                    "type": "boolean",
+                    "const": true,
+                    "default": true
+                },
+                "serverTLS": {
+                    "type": "string",
+                    "const": "TLS_Server",
+                    "default": "TLS_Server"
+                },
+                "virtualPort": {
+                    "type": "number",
+                    "const": 443,
+                    "default": 443
+                },
+                "virtualAddresses": {
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false
+        },
+        "Analytics_Profile": {
+            "type": "object",
+            "default": {},
+            "properties": {
+                "class": {},
+                "collectUserSession": {
+                    "type": "boolean",
+                    "const": true,
+                    "default": true
+                },
+                "collectMaxTpsAndThroughput": {
+                    "type": "boolean",
+                    "const": true,
+                    "default": true
+                }
+            },
+            "additionalproperties": false
+        }
+    },
+    "additionalProperties": {
+        "allOf": [
+            {
+                "anyOf": [
+                    {
+                        "properties": {
+                            "class": {
+                                "const": "Analytics_Profile"
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
+                            "class": {
+                                "const": "Pool"
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
+                            "class": {
+                                "const": "Service_HTTPS"
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
+                            "class": {
+                                "const": "Certificate"
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
+                            "class": {
+                                "const": "TLS_Server"
+                            }
+                        }
+                    },
+                    {
+                        "properties": {
+                            "class": {
+                                "const": "WAF_Policy"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "if": {
+                    "properties": {
+                        "class": {
+                            "const": "Analytics_Profile"
+                        }
+                    }
+                },
+                "then": {
+                    "$ref": "#/definitions/Analytics_Profile"
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "class": {
+                            "const": "Pool"
+                        }
+                    }
+                },
+                "then": {
+                    "$ref": "#/definitions/Pool"
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "class": {
+                            "const": "Service_HTTPS"
+                        }
+                    }
+                },
+                "then": {
+                    "$ref": "#/definitions/Service_HTTPS"
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "class": {
+                            "const": "Certificate"
+                        }
+                    }
+                },
+                "then": {
+                    "$ref": "#/definitions/Certificate"
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "class": {
+                            "const": "TLS_Server"
+                        }
+                    }
+                },
+                "then": {
+                    "$ref": "#/definitions/TLS_Server"
+                }
+            },
+            {
+                "if": {
+                    "properties": {
+                        "class": {
+                            "const": "WAF_Policy"
+                        }
+                    }
+                },
+                "then": {
+                    "$ref": "#/definitions/WAF_Policy"
+                }
+            }
+        ]
+    }
+}
+
