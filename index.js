@@ -39,30 +39,27 @@ database.persistence.setAutocompactionInterval(10000);
 //}
 
 async function refreshToken () {
-//  try {
-    //const testJSON = JSON.parse({ 'refreshToken': { 'token': `${currentToken}`} });
+  try {
     const requestOptions = {
       method: "POST",
       body: JSON.stringify({ 'refreshToken': { 'token': `${RefreshToken}` } })
     }
-    console.log("FRom refresh=",JSON.stringify(requestOptions));
     const api_url = 'https://172.30.108.110/mgmt/shared/authn/exchange'
     const gotToken = await fetch(api_url,requestOptions);
-//    if (gotToken.status == 200) {
+    if (gotToken.status == 200) {
       const json = await gotToken.json();
-      //newToken = await json.token.token;
-      console.log("newToken=",json.token.token);
+      //console.log("newToken=",json.token.token);
       return await json.token.token;
-//    } else {
+    } else {
       //throw "error";
-//      console.log("Thrown an error 56",gotToken.status);
-//      throw new Error("Bad login");
-//    }
-//  } catch {
+      //console.log("Thrown an error 56",gotToken.status);
+      throw new Error("Bad login");
+    }
+  } catch {
     //console.log(err);
-//    const prob = "Failed"
-//   return prob;
-//  }
+    const prob = "Failed"
+    return prob;
+  }
 }
 
 //Get token from IQ, basd on your user credentials - this should be parsed in at sign in to App, but for now is hard-coded.
@@ -73,7 +70,7 @@ app.get('/getToken', async (request, response ) => {
       headers: { 'Content-Type': 'application/json'},
       body: JSON.stringify({ 'username': 'admin', 'password': 'Br0ken-Arr0w', 'loginProviderName': 'tmos' })
     };
-    console.log("FRom refresh=",JSON.stringify(requestOptions)); 
+    //console.log("FRom refresh=",JSON.stringify(requestOptions)); 
     // Simple POST request with a JSON body using fetch
   
     //console.log(requestOptions)
@@ -86,14 +83,12 @@ app.get('/getToken', async (request, response ) => {
       const json = await gotToken.json();
       ActiveToken = json.token.token;
       RefreshToken = json.refreshToken.token;
-      const data = {
-        token: ActiveToken
-      }
+      const data = { token: "Good"}
       //console.log(data);
       response.json(data);
     } else {
       //throw "error";
-      throw new Error("Bad login");
+      throw new Error("Failed");
     }
   } catch (err) {
     //console.log(err);
@@ -104,67 +99,55 @@ app.get('/getToken', async (request, response ) => {
 
 //This will delete the first entry it finds
 app.post('/deleteOne', (request ,response ) => {
-  console.log(request.body.data);
+  //console.log(request.body.data);
   const BIGIP = request.body.data.targetDC;
-  const RecToken = refreshToken();
-  if (RecToken == "Failed") {
-    //throw error
-    throw new Error("Bad login");
-  } else {
-    console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken);
-    ActiveToken = RecToken;
-    console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken);
-  }
-  //const RecToken=request.body.data.token;
-
-
   database.findOne({ targetBIGIP: `${BIGIP}`, AppName: {$ne: "blank"} }, async function (err, docs) {
-    console.log("DBresult=",docs);
-    if (docs = null) {
-    NewTenantName = await docs.RouteDomain;
-    AppName = await docs.AppName;
-    targetBIGIP = await docs.targetBIGIP;
-    ID = await docs._id;
-    fs.readFile(('./deleteTemplate.json'), async (err, ImportTemplate) => {
-      const deleteTemplate = JSON.parse(ImportTemplate);
-      deleteTemplate.applicationName=`${AppName}`;
-      deleteTemplate.appSvcsDeclaration.declaration.target={"address": `${targetBIGIP}`};
-      deleteTemplate.appSvcsDeclaration.declaration[NewTenantName]=deleteTemplate.appSvcsDeclaration.declaration.TenantID_val;
-      delete deleteTemplate.appSvcsDeclaration.declaration.TenantID_val;
-      exec(`./remEntryOnDNS.sh ${AppName}`, (error, stdout, stderr) => {
-        if (error) {
-            console.log(`error: ${error.message}`);
-            //return;
-        }
-        if (stderr) {
+    //console.log("DBresult=",docs);
+    if (docs != null) {
+      NewTenantName = await docs.RouteDomain;
+      AppName = await docs.AppName;
+      targetBIGIP = await docs.targetBIGIP;
+      ID = await docs._id;
+      fs.readFile(('./deleteTemplate.json'), async (err, ImportTemplate) => {
+        const deleteTemplate = JSON.parse(ImportTemplate);
+        deleteTemplate.applicationName=`${AppName}`;
+        deleteTemplate.appSvcsDeclaration.declaration.target={"address": `${targetBIGIP}`};
+        deleteTemplate.appSvcsDeclaration.declaration[NewTenantName]=deleteTemplate.appSvcsDeclaration.declaration.TenantID_val;
+        delete deleteTemplate.appSvcsDeclaration.declaration.TenantID_val;
+        exec(`./remEntryOnDNS.sh ${AppName}`, (error, stdout, stderr) => {
+          if (error) {
+              console.log(`error: ${error.message}`);
+              //return;
+          }
+          if (stderr) {
             console.log(`stderr: ${stderr}`);
             //return;
-        }
-        console.log(`stdout: ${stdout}`);
-      })
+          }
+          console.log(`stdout: ${stdout}`);
+        })
       
-      let RecToken = refreshToken(RefreshToken);
-      ActiveToken = await (RecToken);
-      //const TestToken = "test";
-      console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken)
+        let RecToken = refreshToken(RefreshToken);
+        ActiveToken = await (RecToken);
+        //const TestToken = "test";
+        //console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken)
 
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-F5-Auth-Token': `${ActiveToken}`},
-        body: JSON.stringify(deleteTemplate)
-      };
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-F5-Auth-Token': `${ActiveToken}`},
+          body: JSON.stringify(deleteTemplate)
+        };
 //      console.log(requestOptions)
-      const api_url = 'https://172.30.108.110/mgmt/cm/global/tasks/deploy-to-application';
-      //  Make sure at the bash shell you run 'export NODE_TLS_REJECT_UNAUTHORIZED=0'
-      //  before you run node
-      const gotIQresponse = await fetch(api_url,requestOptions);
-      const json =await gotIQresponse.json();
-      console.log(json)
-      //response.json(json);
-    });
-    database.update({ _id: `${ID}`},{ $set: { AppName: "blank"}});
-    console.log(docs);
-    response.json(docs);
+        const api_url = 'https://172.30.108.110/mgmt/cm/global/tasks/deploy-to-application';
+        //  Make sure at the bash shell you run 'export NODE_TLS_REJECT_UNAUTHORIZED=0'
+        //  before you run node
+        const gotIQresponse = await fetch(api_url,requestOptions);
+        const json =await gotIQresponse.json();
+        //console.log(json)
+        //response.json(json);
+      });
+      database.update({ _id: `${ID}`},{ $set: { AppName: "blank"}});
+      //console.log(docs);
+      response.json(docs);
     } else {
       response.json({AppName:"Empty",Virtual:"Empty"});
     }
@@ -179,20 +162,10 @@ app.post('/buildJSON', (request, response ) => {
   // Simple POST request with a JSON body using fetch
   fs.readFile(('./appTemplate.json'), (err, ImportTemplate) => {
     const AppTemplate = JSON.parse(ImportTemplate);
-    console.log(request.body);
+    //console.log(request.body);
     const NewApp=request.body.data.DomainName;
     const BIGIP=request.body.data.targetDC;
 
-
-//    if (RecToken == "Failed") {
-      //throw error
-//      throw new Error("Bad login");
-//    } else {
-//      console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken)
-//      ActiveToken = RecToken;
-//    }
-    //const RecToken=request.body.data.token;
-  
     //Find first available entry to use 
     database.findOne({ targetBIGIP: `${BIGIP}`, AppName: 'blank' }, async function (err, docs) {
 //      console.log("database=",docs);
@@ -207,8 +180,7 @@ app.post('/buildJSON', (request, response ) => {
       let RecToken = refreshToken(RefreshToken);
       ActiveToken = await (RecToken);
       //const TestToken = "test";
-      console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken)
-
+      //console.log("ActiveToken=",ActiveToken,"ReckToken=",RecToken)
 
       const LogView=AppTemplate;
 //      console.log("OriginalTemplate",JSON.stringify(LogView,null,4));
@@ -249,11 +221,11 @@ app.post('/buildJSON', (request, response ) => {
               console.log(`stderr: ${stderr}`);
               //return;
           }
-          console.log(`stdout: ${stdout}`);
+          //console.log(`stdout: ${stdout}`);
         })
         database.update({ _id: `${ID}`},{ $set: { AppName: `${NewApp}`}});
       }
-      console.log(json)
+      //console.log(json)
       response.json(json);
     });
   });  
@@ -263,14 +235,14 @@ app.post('/buildJSON', (request, response ) => {
 app.get('/TestTool', async ( request, response ) => {
   exec("ls -la", (error, stdout, stderr) => {
     if (error) {
-        console.log(`error: ${error.message}`);
+        //console.log(`error: ${error.message}`);
         return;
     }
     if (stderr) {
-        console.log(`stderr: ${stderr}`);
+        //console.log(`stderr: ${stderr}`);
         return;
     }
-    console.log(`stdout: ${stdout}`);
+    //console.log(`stdout: ${stdout}`);
 })
 
 //  fs.readFile(('./appTemplate.json'), (err, ImportTemplate) => {
