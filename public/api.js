@@ -63,8 +63,31 @@ button3.addEventListener('click', async build => {
 		document.getElementById("messages").innerHTML = `Service status ${json_app.status} `;
 	}
 })
-			
-const button4 = document.getElementById('TestTool');
+
+const button4 = document.getElementById('DeleteApp');
+button4.addEventListener('click', async getlist => {
+	const DomainName=document.getElementById("myName").value;
+	const targetBIGIP=document.getElementById("SelectDC").value;
+	//if( typeof UseToken == 'undefined' ) {
+	//	UseToken = "empty";
+	//}
+	//const data={"targetDC":`${targetBIGIP}`,"token":`${UseToken}`};
+	const data={"targetDC":`${targetBIGIP}`, "AppName":`${DomainName}`};
+	const api_app_url='deleteApp';
+	const requestOptions = {
+		method: 'POST',
+		headers: {
+   	    	'Content-Type': 'application/json'
+    	},
+    	body: JSON.stringify({data})
+	};
+	const response_app = await fetch(api_app_url,requestOptions);
+	const json_app = await response_app.json();
+	document.getElementById("messages").innerHTML = `Deleting service ${json_app.AppName} VIP address ${json_app.Virtual}`;
+	console.log(json_app);
+})
+
+const button5 = document.getElementById('TestTool');
 button4.addEventListener('click', async fetchtest => {
 	const api_tok_url='TestTool';
 	const response_fetchtest = await fetch(api_tok_url);
