@@ -13,17 +13,18 @@ A number of assumptions were made
 
 . The AS3 declarations encompassed GSLB/LTM/WAF
 
-The json templates are used by BIG-IQ and have been modified to highlight the fields to be populated. Every 'X_val' within the json templates needs to be replaced with the correct information for BIG-IQ to deploy the App on the target BIG-IP.
+The json templates that are used by BIG-IQ have been modified to highlight the fields to be replaced by the 'source of truth'. Every 'X_val' within the json templates needs to be replaced with the correct information for BIG-IQ to deploy the App on the target BIG-IP.
 
-You can deploy an application by one of two ways.
+You can initiate the deployment of an application by one of two ways.
 
- --------    ----------     --------     --------
-| Script |--|API Portal|---| BIG-IQ |---| BIG-IP |
- --------    ----------     --------     --------
+ --------     ----------     --------     --------
+| Script |-->|API Portal|-->| BIG-IQ |-->| BIG-IP |
+ --------     ----------     --------     --------
 Or
  ---------     ----------     --------     --------
-| Browser |---|Web Portal|---| BIG-IQ |---| BIG-IP |
+| Browser |-->|Web Portal|-->| BIG-IQ |-->| BIG-IP |
  ---------     ----------     --------     --------
+
 
 
 
