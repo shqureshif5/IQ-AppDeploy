@@ -28,6 +28,8 @@ database.persistence.setAutocompactionInterval(10000);
 
 //##This will re-initialise the database, recommend clearing the DB before uncommenting and running
 //Initialise the database - can be commented, once run
+//It will create a bunch of pool-IP with no applications assigned to them. When the Portal creates an App it
+//will then pick the next pool entry available for the target BIG-IP (DC) and allocate the App name against it
 //var i;
 //for (i = 0; i < 200; i++) {
 //  const RD1 = 2400 + i;
