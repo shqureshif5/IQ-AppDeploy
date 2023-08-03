@@ -29,14 +29,18 @@ Below is an example script that would send a REST-API call into the Orchestratio
 
 ---
 #!/bin/bash
+
 #Script will use two variables $1 = DNSname of App (AppName), $2 = Target DC (i.e. which BIG-IP to deploy App on)
+
 curl http://172.30.104.95:3000/getToken
+
 POSTstring="{ \"data\": { \"DomainName\":\"$1\", \"targetDC\":\"$2\" }}"
+
 curl -k -H "Content-Type: application/json" -X POST -d "$POSTstring"  http://172.30.104.95:3000/BuildJSON
 
 ---
 
-The above example script could then be run as recursively to create a number of Applications
-i.e 
+The above example script could then be run as recursively to create a number of Applications - i.e
+
  for i in {1..99}; do ./<ScriptName>.sh 172.30.107.14 dcaTestApp$i; ./<ScriptName.sh> 172.30.107.16 dcbTestApp$i; sleep 25; done
 
