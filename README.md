@@ -15,5 +15,16 @@ A number of assumptions were made
 
 The json templates are used by BIG-IQ and have been modified to highlight the fields to be populated. Every 'X_val' within the json templates needs to be replaced with the correct information for BIG-IQ to deploy the App on the target BIG-IP.
 
+You can deploy an application by one of two ways.
+
+ --------    ----------     --------     --------
+| Script |--|API Portal|---| BIG-IQ |---| BIG-IP |
+ --------    ----------     --------     --------
+Or
+ ---------     ----------     --------     --------
+| Browser |---|Web Portal|---| BIG-IQ |---| BIG-IP |
+ ---------     ----------     --------     --------
 
 
+
+ 
