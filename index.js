@@ -71,7 +71,7 @@ app.get('/getToken', async (request, response ) => {
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json'},
-      body: JSON.stringify({ 'username': 'admin', 'password': 'Br0ken-Arr0w', 'loginProviderName': 'tmos' })
+      body: JSON.stringify({ 'username': 'admin', 'password': 'admin', 'loginProviderName': 'tmos' })
     };
     //console.log("FRom refresh=",JSON.stringify(requestOptions)); 
     // Simple POST request with a JSON body using fetch
