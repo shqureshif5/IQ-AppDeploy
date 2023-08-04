@@ -48,5 +48,5 @@ curl -k -H "Content-Type: application/json" -X POST -d "$POSTstring"  http://172
 
 The above example script could then be run recursively to create a number of Applications - i.e
 
- for i in {1..99}; do ./<ScriptName>.sh 172.30.107.14 dcaTestApp$i; ./<ScriptName.sh> 172.30.107.16 dcbTestApp$i; sleep 25; done
+ for i in {1..99}; do <ScriptName.sh> 172.30.107.14 dcaTestApp$i; <ScriptName.sh> 172.30.107.16 dcbTestApp$i; sleep 25; done
 
