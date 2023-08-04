@@ -15,7 +15,13 @@ A number of assumptions were made
 
 The json templates that are used by BIG-IQ have been modified to highlight the fields to be replaced by the 'source of truth'. Every 'X_val' within the json templates needs to be replaced with the correct information for BIG-IQ to deploy the App on the target BIG-IP.
 
-You can initiate the deployment of an application by one of two ways.
+nodejs is used to startup the Orchestration tool
+
+'export NODE_TLS_REJECT_UNAUTHORIZED=0'
+
+'node ./index.js'
+
+You can initiate the deployment of an application on a BIG-IP by one of two ways.
 
  --------     ----------     --------     --------
 | Script |-->|API Portal|-->| BIG-IQ |-->| BIG-IP |
